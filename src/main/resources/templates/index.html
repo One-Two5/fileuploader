@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/css/styles.css}" />
+<head>
+    <title>Example Thymeleaf</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+<h1>Welcome!</h1>
+<button type="button" th:text="Загрузить реестр"></button>
+<table>
+    <thead>
+    <tr>
+        <th>№</th>
+        <th>Полное наименование</th>
+        <th>Основания</th>
+        <th>Дата включения</th>
+        <th>Дата исключения</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="agent, iterStat : ${foreignAgents}">
+        <td th:text="${iterStat.count}"></td>
+        <td th:text="${agent.fullName}"></td>
+        <td th:text="${agent.reason}"></td>
+        <td th:text="${agent.dateIncluded}"></td>
+        <td th:text="${agent.dateExcluded}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
