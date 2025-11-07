@@ -1,53 +1,48 @@
 package com.example.fileuploader.repository;
 
-import com.example.fileuploader.entity.ForeignAgents;
+import com.example.fileuploader.entity.ForeignAgent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
+@Repository
 public class ForeignAgentRepository {
-    private final Connection connection;
+    private final JdbcTemplate jdbcTemplate;
 
-    public ForeignAgentRepository(Connection connection) {
-        this.connection = connection;
+    public ForeignAgentRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void save(ForeignAgents agents) throws SQLException {
-        String sql = "INSERT INTO foreigns_agents (full_name, reason, date_included, date_excluded)" +
-                "VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, agents.getFullName());
-            ps.setString(2, agents.getReason());
-            ps.setDate(3, Date.valueOf(agents.getDateExcluded()));
-            if (agents.getDateExcluded() != null) {
-                ps.setDate(4, Date.valueOf(agents.getDateExcluded()));
-            } else {
-                ps.setNull(4, Types.DATE);
-            }
-            ps.executeUpdate();
-        }
+    public void save(ForeignAgent agent) {
+        jdbcTemplate.update
+                ("INSERT INTO foreign_agent (full_name, reason, date_included, date_excluded) VALUES (?, ?, ?, ?)",
+                 agent.getFullName(),
+                 agent.getReason(),
+                 agent.getDateIncluded(),
+                 agent.getDateExcluded()
+        );
     }
 
-    public List<ForeignAgents> findAll() throws SQLException {
-        List<ForeignAgents> list = new ArrayList<>();
-        String sql = "SELECT id, full_name, reason, date_included, date-excluded, FROM foreign_agents";
-        try (Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
+    public List<ForeignAgent> findAll() {
+        String sql = "SELECT id, full_name, reason, date_included, date_excluded FROM foreign_agent";
+        return jdbcTemplate.query(sql, new ForeignAgentMapper());
+    }
 
-            while (rs.next()) {
-                ForeignAgents agents = new ForeignAgents();
-                agents.setId(rs.getLong("id"));
-                agents.setFullName(rs.getString("full_name"));
-                agents.setReason(rs.getString("reason"));
-                agents.setDateIncluded(rs.getDate("date_included").toLocalDate());
-                Date excludedDate = rs.getDate("date_excluded");
-                if (excludedDate != null) {
-                    agents.setDateIncluded(excludedDate.toLocalDate());
-                }
-                list.add(agents);
-            }
+    private static class ForeignAgentMapper implements RowMapper<ForeignAgent> {
+        @Override
+        public ForeignAgent mapRow(ResultSet rs, int rowNum) throws SQLException {
+            ForeignAgent agent = new ForeignAgent();
+            agent.setId(rs.getLong("id"));
+            agent.setFullName(rs.getString("full_name"));
+            agent.setReason(rs.getString("reason"));
+            agent.setDateIncluded(rs.getObject("date_included", LocalDate.class));
+            agent.setDateExcluded(rs.getObject("date_excluded", LocalDate.class));
+            return agent;
         }
-        return list;
     }
 }

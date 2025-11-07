@@ -1,10 +1,9 @@
 package com.example.fileuploader.entity;
 
 import org.springframework.data.annotation.Id;
-
 import java.time.LocalDate;
 
-public class ForeignAgents {
+public class ForeignAgent {
     @Id
     private long id;
     private String fullName;
@@ -12,7 +11,7 @@ public class ForeignAgents {
     private LocalDate dateIncluded;
     private LocalDate dateExcluded;
 
-    public ForeignAgents(Long id, String fullName, String reason, LocalDate dateIncluded, LocalDate dateExcluded) {
+    public ForeignAgent(Long id, String fullName, String reason, LocalDate dateIncluded, LocalDate dateExcluded) {
         this.id = id;
         this.fullName = fullName;
         this.reason = reason;
@@ -20,7 +19,7 @@ public class ForeignAgents {
         this.dateExcluded = dateExcluded;
     }
 
-    public ForeignAgents() {
+    public ForeignAgent() {
 
     }
 
