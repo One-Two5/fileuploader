@@ -16,7 +16,13 @@ public class MainController {
 
     @GetMapping("/")
     public String index() {
-        foreignAgentRepository.save("Example", "Example", "Причина", LocalDate.now());
+        ForeignAgent agent = new ForeignAgent();
+        agent.setFullName("Name");
+        agent.setReason("Example");
+        agent.setDateIncluded(LocalDate.now());
+        agent.setDateExcluded(null);
+        foreignAgentRepository.save(agent);
+
         return "index";
     }
 
